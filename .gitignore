@@ -1,10 +1,148 @@
+# ============================================
 # Python-generated files
+# ============================================
 __pycache__/
-*.py[oc]
+*.py[cod]
+*.pyo
+*.pyd
+.Python
+*.so
+*.egg
+*.egg-info/
+.eggs/
+pip-log.txt
+pip-delete-this-directory.txt
+
+# ============================================
+# Virtual environments
+# ============================================
+.venv/
+venv/
+ENV/
+env/
+.ENV
+.env.local
+.env.*.local
+
+# ============================================
+# Environment files
+# ============================================
+.env
+.env.local
+.env.*.local
+*.env
+
+# ============================================
+# Build artifacts
+# ============================================
 build/
 dist/
 wheels/
-*.egg-info
+*.egg-info/
+*.egg
+.eggs/
 
-# Virtual environments
-.venv
+# ============================================
+# Testing artifacts
+# ============================================
+.pytest_cache/
+.coverage
+htmlcov/
+.tox/
+.hypothesis/
+*.cover
+*.log
+.cache
+nosetests.xml
+coverage.xml
+*.mo
+*.pot
+
+# ============================================
+# IDE files
+# ============================================
+# VS Code
+.vscode/
+*.code-workspace
+
+# PyCharm
+.idea/
+*.iml
+*.iws
+*.ipr
+
+# Sublime Text
+*.sublime-project
+*.sublime-workspace
+
+# Vim
+*.swp
+*.swo
+*~
+.vim/
+
+# Emacs
+*~
+\#*\#
+.\#*
+
+# Jupyter Notebook
+.ipynb_checkpoints
+
+# ============================================
+# OS files
+# ============================================
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+._*
+
+# Windows
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+$RECYCLE.BIN/
+*.cab
+*.msi
+*.msix
+*.msm
+*.msp
+*.lnk
+
+# Linux
+*~
+.directory
+.Trash-*
+
+# ============================================
+# Project-specific
+# ============================================
+output/
+logs/
+*.db
+*.sqlite
+*.sqlite3
+*.log
+backup/
+backups/
+*.bak
+*.tmp
+
+# ============================================
+# Docker
+# ============================================
+.dockerignore
+
+# ============================================
+# Pre-commit
+# ============================================
+.pre-commit-config.yaml
+
+# ============================================
+# Cursor
+# ============================================
+.cursorrules
+ARCHITECTURE.md
+PROJECT_PHASES.md
+

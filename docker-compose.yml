@@ -1,0 +1,104 @@
+services:
+  # PostgreSQL Database
+  postgres:
+    image: postgres:16-alpine
+    container_name: srs-postgres
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-srs_assistant}
+      POSTGRES_USER: ${POSTGRES_USER:-srs_user}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-srs_password}
+      PGDATA: /var/lib/postgresql/data/pgdata
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    ports:
+      - "${POSTGRES_PORT:-5432}:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-srs_user} -d ${POSTGRES_DB:-srs_assistant}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - srs-network
+    restart: unless-stopped
+
+  # Main Application (Streamlit + LangGraph)
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: srs-app
+    environment:
+      # Database
+      DATABASE_URL: postgresql://${POSTGRES_USER:-srs_user}:${POSTGRES_PASSWORD:-srs_password}@postgres:5432/${POSTGRES_DB:-srs_assistant}
+      POSTGRES_HOST: postgres
+      POSTGRES_PORT: 5432
+      POSTGRES_DB: ${POSTGRES_DB:-srs_assistant}
+      POSTGRES_USER: ${POSTGRES_USER:-srs_user}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-srs_password}
+      
+      # LLM Configuration
+      OPENAI_API_KEY: ${OPENAI_API_KEY}
+      ANTHROPIC_API_KEY: ${ANTHROPIC_API_KEY:-}
+      
+      # Application Settings
+      LOG_LEVEL: ${LOG_LEVEL:-INFO}
+      OUTPUT_DIR: /app/output
+      ENVIRONMENT: ${ENVIRONMENT:-production}
+      
+      # Langfuse (Observability)
+      LANGFUSE_PUBLIC_KEY: ${LANGFUSE_PUBLIC_KEY:-}
+      LANGFUSE_SECRET_KEY: ${LANGFUSE_SECRET_KEY:-}
+      LANGFUSE_HOST: ${LANGFUSE_HOST:-https://cloud.langfuse.com}
+      
+      # Memori (Long-term Memory)
+      MEMORI_API_URL: ${MEMORI_API_URL:-}
+      MEMORI_API_KEY: ${MEMORI_API_KEY:-}
+      
+      # Streamlit
+      STREAMLIT_SERVER_PORT: 8501
+      STREAMLIT_SERVER_ADDRESS: 0.0.0.0
+      STREAMLIT_BROWSER_GATHER_USAGE_STATS: "false"
+    volumes:
+      - ./src:/app/src:ro
+      - ./output:/app/output
+      - ./logs:/app/logs
+    ports:
+      - "${APP_PORT:-8501}:8501"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - srs-network
+    restart: unless-stopped
+    command: streamlit run main.py --server.port=8501 --server.address=0.0.0.0
+
+  # Optional: pgAdmin for database management
+  pgadmin:
+    image: dpage/pgadmin4:latest
+    container_name: srs-pgadmin
+    environment:
+      PGADMIN_DEFAULT_EMAIL: ${PGADMIN_EMAIL:-admin@srs.local}
+      PGADMIN_DEFAULT_PASSWORD: ${PGADMIN_PASSWORD:-admin}
+      PGADMIN_CONFIG_SERVER_MODE: "False"
+    volumes:
+      - pgadmin_data:/var/lib/pgadmin
+    ports:
+      - "${PGADMIN_PORT:-5050}:80"
+    depends_on:
+      - postgres
+    networks:
+      - srs-network
+    restart: unless-stopped
+    profiles:
+      - tools
+
+volumes:
+  postgres_data:
+    driver: local
+  pgadmin_data:
+    driver: local
+
+networks:
+  srs-network:
+    driver: bridge
+

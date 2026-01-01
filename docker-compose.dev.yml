@@ -1,0 +1,21 @@
+# Development override for docker-compose.yml
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    volumes:
+      # Mount source code for hot reload
+      - ./src:/app/src
+      - ./main.py:/app/main.py
+      - ./pyproject.toml:/app/pyproject.toml
+      - ./output:/app/output
+      - ./logs:/app/logs
+    environment:
+      ENVIRONMENT: development
+      LOG_LEVEL: DEBUG
+      # Enable auto-reload in development
+      STREAMLIT_SERVER_RUN_ON_SAVE: "true"
+      STREAMLIT_SERVER_FILE_WATCHER: "true"
+    command: streamlit run main.py --server.port=8501 --server.address=0.0.0.0 --server.runOnSave=true
+
